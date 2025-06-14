@@ -1,82 +1,315 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Image Compressor - Reduce Image File Size Instantly</title>
-  <meta name="description" content="Compress images instantly and reduce file size without losing quality. Free, fast and private - no uploads!">
+  <title>Image Compressor Pro | Reduce Image Size Instantly</title>
+  <meta name="description" content="Professional image compression tool. Reduce file size without quality loss. 100% private - no uploads required.">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tailwindcss/postcss7-compat@2.2.19/dist/tailwind.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #0f172a;
     }
-    .drop-shadow {
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    .card {
+      background: linear-gradient(145deg, #1e293b, #0f172a);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .file-input {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px dashed rgba(148, 163, 184, 0.3);
+      transition: all 0.3s ease;
+    }
+    .file-input:hover {
+      border-color: #60a5fa;
+      background: rgba(30, 41, 59, 0.8);
+    }
+    .compress-btn {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+      transition: all 0.3s ease;
+    }
+    .compress-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    }
+    .compress-btn:active {
+      transform: translateY(0);
+    }
+    .progress-bar {
+      height: 4px;
+      background: linear-gradient(90deg, #3b82f6, #60a5fa);
+      width: 0;
+      transition: width 0.5s ease;
+    }
+    .download-btn {
+      background: linear-gradient(135deg, #10b981, #059669);
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+    .download-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-white min-h-screen flex items-center justify-center px-4">
-  <div class="bg-white rounded-2xl p-8 max-w-lg w-full drop-shadow text-center">
-    <h1 class="text-2xl font-bold text-gray-800 mb-2">Image Compressor</h1>
-    <p class="text-sm text-gray-500 mb-6">Compress your images and reduce file size without quality loss. Fast, free & secure.</p><input type="file" id="imageInput" accept="image/*" class="mb-4 w-full border rounded px-4 py-2" />
-<button onclick="compressImage()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-full transition duration-200">Compress Image</button>
+<body class="min-h-screen flex items-center justify-center px-4">
+  <div class="card rounded-xl p-8 max-w-lg w-full text-center animate__animated animate__fadeIn">
+    <div class="flex justify-center mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    </div>
+    <h1 class="text-3xl font-bold text-blue-100 mb-2">Image Compressor Pro</h1>
+    <p class="text-sm text-slate-400 mb-6">Reduce image size without quality loss. Fast, secure, and 100% private.</p>
+    
+    <div class="file-input rounded-xl p-8 mb-6 cursor-pointer transition-all duration-300" id="dropZone">
+      <input type="file" id="imageInput" accept="image/*" class="hidden" />
+      <div class="flex flex-col items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+        </svg>
+        <p class="text-blue-300 font-medium">Click to upload or drag & drop</p>
+        <p class="text-xs text-slate-500 mt-1">JPEG, PNG, WEBP supported</p>
+      </div>
+    </div>
+    
+    <div class="progress-bar mb-6 rounded-full"></div>
+    
+    <button id="compressBtn" class="compress-btn text-white py-3 px-8 rounded-full font-medium w-full mb-6">
+      Compress Image
+    </button>
+    
+    <canvas id="canvas" style="display: none;"></canvas>
+    
+    <div class="mt-6 hidden" id="resultContainer">
+      <div class="relative group">
+        <img id="preview" class="mx-auto max-w-full rounded-lg border border-slate-700 transition-all duration-300 group-hover:border-blue-400" />
+        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg">
+          <button id="downloadBtn" class="download-btn text-white py-2 px-6 rounded-full text-sm font-medium flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Download
+          </button>
+        </div>
+      </div>
+      <div id="info" class="text-sm text-slate-400 mt-4 p-3 bg-slate-800 rounded-lg"></div>
+    </div>
+  </div>
 
-<canvas id="canvas" style="display: none;"></canvas>
-<div class="mt-6">
-  <img id="preview" class="mx-auto max-w-full rounded-lg" />
-  <p id="info" class="text-sm text-gray-600 mt-2"></p>
-</div>
-
-  </div>  <script>
+  <script>
     let originalImage;
+    const dropZone = document.getElementById('dropZone');
+    const imageInput = document.getElementById('imageInput');
+    const compressBtn = document.getElementById('compressBtn');
+    const progressBar = document.querySelector('.progress-bar');
+    const resultContainer = document.getElementById('resultContainer');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const preview = document.getElementById('preview');
 
-    document.getElementById("imageInput").addEventListener("change", function (e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (event) {
-          originalImage = new Image();
-          originalImage.src = event.target.result;
-        };
-        reader.readAsDataURL(file);
+    // Handle drag and drop
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight() {
+      dropZone.classList.add('border-blue-400', 'bg-slate-800');
+    }
+
+    function unhighlight() {
+      dropZone.classList.remove('border-blue-400', 'bg-slate-800');
+    }
+
+    dropZone.addEventListener('drop', handleDrop, false);
+    dropZone.addEventListener('click', () => imageInput.click());
+
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files.length) {
+        handleFiles(files);
+      }
+    }
+
+    imageInput.addEventListener('change', function(e) {
+      if (e.target.files.length) {
+        handleFiles(e.target.files);
       }
     });
 
-    function compressImage() {
-      if (!originalImage) return alert("Please select an image first.");
+    function handleFiles(files) {
+      const file = files[0];
+      if (!file.type.match('image.*')) {
+        showAlert('Please select an image file (JPEG, PNG, WEBP)');
+        return;
+      }
 
-      const canvas = document.getElementById("canvas");
-      const ctx = canvas.getContext("2d");
-      const width = originalImage.width * 0.7;
-      const height = originalImage.height * 0.7;
-
-      canvas.width = width;
-      canvas.height = height;
-
-      ctx.drawImage(originalImage, 0, 0, width, height);
-
-      canvas.toBlob(
-        function (blob) {
-          const newImg = document.getElementById("preview");
-          newImg.src = URL.createObjectURL(blob);
-
-          const originalSize = (originalImage.src.length / 1024).toFixed(2);
-          const compressedSize = (blob.size / 1024).toFixed(2);
-
-          const infoEl = document.getElementById("info");
-          infoEl.innerHTML = `Original: ${originalSize} KB | Compressed: ${compressedSize} KB`;
-
-          const link = document.createElement("a");
-          link.download = "compressed-image.jpg";
-          link.href = newImg.src;
-          link.className = "text-blue-600 underline text-sm mt-2 inline-block";
-          link.textContent = "Click here to download compressed image";
-
-          infoEl.appendChild(document.createElement("br"));
-          infoEl.appendChild(link);
-        },
-        "image/jpeg",
-        0.6
-      );
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        originalImage = new Image();
+        originalImage.onload = function() {
+          dropZone.innerHTML = `
+            <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span class="text-slate-300">${file.name}</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">${(file.size / 1024).toFixed(2)} KB • ${originalImage.width}×${originalImage.height}px</p>
+          `;
+          compressBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        };
+        originalImage.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
     }
-  </script></body>
+
+    compressBtn.addEventListener('click', compressImage);
+
+    function compressImage() {
+      if (!originalImage) {
+        showAlert('Please select an image first.');
+        return;
+      }
+
+      // Show loading animation
+      compressBtn.innerHTML = `
+        <div class="flex items-center justify-center">
+          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Compressing...
+        </div>
+      `;
+      compressBtn.classList.add('cursor-not-allowed');
+
+      // Animate progress bar
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 5;
+        progressBar.style.width = `${Math.min(progress, 90)}%`;
+        if (progress >= 90) clearInterval(interval);
+      }, 50);
+
+      setTimeout(() => {
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Calculate new dimensions (max 2000px on the longest side)
+        let width = originalImage.width;
+        let height = originalImage.height;
+        const maxDimension = 2000;
+        const ratio = Math.min(maxDimension / width, maxDimension / height);
+        
+        if (ratio < 1) {
+          width = Math.floor(width * ratio);
+          height = Math.floor(height * ratio);
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        // Draw image with quality reduction
+        ctx.drawImage(originalImage, 0, 0, width, height);
+
+        // Finalize progress bar
+        progressBar.style.width = '100%';
+        
+        canvas.toBlob(
+          function(blob) {
+            // Complete the progress bar animation
+            setTimeout(() => {
+              progressBar.style.width = '0';
+            }, 300);
+
+            // Show result
+            const compressedUrl = URL.createObjectURL(blob);
+            preview.src = compressedUrl;
+            resultContainer.classList.remove('hidden');
+            resultContainer.classList.add('animate__animated', 'animate__fadeIn');
+
+            const originalSize = (originalImage.src.length / 1024).toFixed(2);
+            const compressedSize = (blob.size / 1024).toFixed(2);
+            const reduction = (100 - (blob.size / (originalImage.src.length) * 100)).toFixed(1);
+
+            document.getElementById('info').innerHTML = `
+              <div class="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <p class="text-xs text-slate-500">Original</p>
+                  <p class="font-medium text-slate-200">${originalSize} KB</p>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-500">Compressed</p>
+                  <p class="font-medium text-green-400">${compressedSize} KB</p>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-500">Reduction</p>
+                  <p class="font-medium text-blue-400">${reduction}%</p>
+                </div>
+              </div>
+            `;
+
+            // Reset button
+            compressBtn.innerHTML = 'Compress Another Image';
+            compressBtn.classList.remove('cursor-not-allowed');
+
+            // Set up download
+            downloadBtn.onclick = function() {
+              const a = document.createElement('a');
+              a.href = compressedUrl;
+              a.download = 'compressed_' + (imageInput.files[0]?.name || 'image.jpg');
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              
+              // Add download confirmation
+              const originalText = downloadBtn.innerHTML;
+              downloadBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Downloaded!
+              `;
+              setTimeout(() => {
+                downloadBtn.innerHTML = originalText;
+              }, 2000);
+            };
+          },
+          'image/jpeg',
+          0.7 // Quality setting (0.7 = 70%)
+        );
+      }, 800); // Simulate processing time for better UX
+    }
+
+    function showAlert(message) {
+      const alert = document.createElement('div');
+      alert.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-4 py-2 rounded-md shadow-lg animate__animated animate__fadeInDown';
+      alert.textContent = message;
+      document.body.appendChild(alert);
+      
+      setTimeout(() => {
+        alert.classList.add('animate__fadeOutUp');
+        setTimeout(() => {
+          document.body.removeChild(alert);
+        }, 500);
+      }, 3000);
+    }
+  </script>
+</body>
 </html>
