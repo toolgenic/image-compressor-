@@ -4,17 +4,17 @@
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
   
-  <!-- Primary Gumroad Product URL -->
+  <!-- Main Tool Page -->
   <url>
-    <loc>https://konadkar.gumroad.com/l/image-compressor-pro</loc>
+    <loc>https://toolgenic.github.io/image-compressor-/</loc>
     <lastmod>2025-06-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   
-  <!-- Demo Page (if hosted separately) -->
+  <!-- Gumroad Product Page -->
   <url>
-    <loc>https://yourdemo.com/image-compressor</loc>
+    <loc>https://konadkar.gumroad.com/l/image-compressor-pro</loc>
     <lastmod>2025-06-15</lastmod>
     <priority>0.8</priority>
   </url>
